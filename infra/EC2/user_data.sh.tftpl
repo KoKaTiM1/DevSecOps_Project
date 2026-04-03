@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euxo pipefail
+
+sudo dnf update -y
+sudo dnf install -y docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+IMAGE="kokatim1/devsecops-project:latest"
+CONTAINER_NAME="devsecops-web"
+
+sudo docker pull "$IMAGE"
+
+# Replace any previous container instance so bootstrap remains idempotent.
+sudo docker rm -f "$CONTAINER_NAME" || true
+
+sudo docker run -d \
+	--name "$CONTAINER_NAME" \
+	--restart unless-stopped \
+	-p 80:80 \
+	"$IMAGE"
