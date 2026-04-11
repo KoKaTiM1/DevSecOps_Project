@@ -17,7 +17,7 @@ module "vpc" {
 }
 
 module "ec2" {
-  source = "./ec2"
+  source = "./EC2"
 
   subnet_id          = module.vpc.subnet_id
   security_group_id  = module.vpc.allow_traffic
