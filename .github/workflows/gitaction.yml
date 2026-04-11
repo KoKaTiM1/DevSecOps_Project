@@ -23,14 +23,14 @@ jobs:
         if: ${{ github.actor == 'KoKaTiM1' }}
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_A }}:role/github-actions-role
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_A }}:role/oidc-provider
           aws-region: us-east-1
 
       - name: Configure AWS credentials B
         if: ${{ github.actor == 'yossef-cohen' }}
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_B }}:role/github-actions-role
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_B }}:role/oidc-provider
           aws-region: us-east-1
 
       - name: Setup Terraform
