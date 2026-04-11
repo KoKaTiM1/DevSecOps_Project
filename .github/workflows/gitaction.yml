@@ -19,17 +19,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials A
+        if: ${{ github.actor == 'KoKaTiM1' }}
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::937115287175:role/oidc-provider
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_A }}:role/github-actions-role
+          aws-region: us-east-1
+
+      - name: Configure AWS credentials B
+        if: ${{ github.actor == 'yossef-cohen' }}
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_B }}:role/github-actions-role
           aws-region: us-east-1
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Plan
         run: terraform plan -input=false
+
+      
