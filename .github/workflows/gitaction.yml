@@ -46,7 +46,7 @@ jobs:
       - name: Attach IAM policy
         run: |
           aws iam attach-role-policy \
-            --role-name eyedar-prod-github-actions-deployer \
+            --role-name oidc-provider \
             --policy-arn arn:aws:iam::aws:policy/AdministratorAccess 2>&1 | grep -v "NoSuchEntity|EntityAlreadyExists" || true
         continue-on-error: true
 
