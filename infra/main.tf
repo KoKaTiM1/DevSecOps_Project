@@ -6,11 +6,11 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "eyedar-prod-terraform-state"
+    bucket         = "project-terraform-state"
     key            = "prod/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
-    dynamodb_table = "eyedar-prod-terraform-locks"
+    dynamodb_table = "project-terraform-locks"
   }
 }
 
