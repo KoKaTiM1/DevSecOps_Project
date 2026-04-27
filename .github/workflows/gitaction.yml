@@ -2,6 +2,16 @@ name: Terraform AWS
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
 
 permissions:
   id-token: write
@@ -42,4 +52,5 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -input=false
 
-      
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve
