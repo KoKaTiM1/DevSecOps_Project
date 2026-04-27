@@ -6,7 +6,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "project-terraform-state"
+    bucket         = "project-yossef-terraform-state"
     key            = "infra/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
