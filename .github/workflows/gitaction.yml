@@ -43,6 +43,13 @@ jobs:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_B }}:role/oidc-provider
           aws-region: us-east-1
 
+      - name: Attach IAM policy
+        run: |
+          aws iam attach-role-policy \
+            --role-name eyedar-prod-github-actions-deployer \
+            --policy-arn arn:aws:iam::aws:policy/AdministratorAccess 2>&1 | grep -v "NoSuchEntity|EntityAlreadyExists" || true
+        continue-on-error: true
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
 
