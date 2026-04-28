@@ -55,7 +55,7 @@ jobs:
           AWS_REGION: us-east-1
         run: |
           REGION="${{ env.AWS_REGION }}"
-          BUCKET="project-final-DevOpsSec-terraform-state"
+          BUCKET="project-final-devopssec-terraform-state"
           TABLE="project-terraform-locks"
 
           echo "Creating S3 bucket for Terraform state..."
