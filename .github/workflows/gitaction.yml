@@ -106,21 +106,26 @@ jobs:
 
           echo "Removing all object versions and delete markers from S3 bucket..."
           while true; do
-            VERSIONS=$(aws s3api list-object-versions --bucket $BUCKET --region $REGION --output text --query 'Versions[*].[Key,VersionId]')
-            MARKERS=$(aws s3api list-object-versions --bucket $BUCKET --region $REGION --output text --query 'DeleteMarkers[*].[Key,VersionId]')
-            if [ -z "$VERSIONS" ] && [ -z "$MARKERS" ]; then
+            aws s3api list-object-versions --bucket $BUCKET --region $REGION --output text > versions.txt
+            FOUND=0
+            # Delete all versions
+            grep '^VERSIONS' versions.txt | while read _ KEY VERSION_ID _; do
+              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
+                aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region $REGION || true
+                FOUND=1
+              fi
+            done
+            # Delete all delete markers
+            grep '^DELETEMARKERS' versions.txt | while read _ KEY VERSION_ID _; do
+              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
+                aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region $REGION || true
+                FOUND=1
+              fi
+            done
+            # If nothing found, break
+            if ! grep -q '^VERSIONS\|^DELETEMARKERS' versions.txt; then
               break
             fi
-            for row in $VERSIONS; do
-              KEY=$(echo $row | awk '{print $1}')
-              VERSION_ID=$(echo $row | awk '{print $2}')
-              aws s3api delete-object --bucket $BUCKET --key "$KEY" --version-id "$VERSION_ID" --region $REGION || true
-            done
-            for row in $MARKERS; do
-              KEY=$(echo $row | awk '{print $1}')
-              VERSION_ID=$(echo $row | awk '{print $2}')
-              aws s3api delete-object --bucket $BUCKET --key "$KEY" --version-id "$VERSION_ID" --region $REGION || true
-            done
           done
 
           echo "Deleting S3 bucket..."
