@@ -100,36 +100,55 @@ jobs:
         env:
           AWS_REGION: us-east-1
         run: |
+          set -euo pipefail
+
           BUCKET="project-final-devopssec-terraform-state"
           TABLE="project-terraform-locks"
-          REGION="${{ env.AWS_REGION }}"
+          REGION="${AWS_REGION}"
+
+          echo "Checking AWS identity..."
+          aws sts get-caller-identity
 
           echo "Removing all object versions and delete markers from S3 bucket..."
+
           while true; do
-            aws s3api list-object-versions --bucket $BUCKET --region $REGION --output text > versions.txt
-            FOUND=0
-            # Delete all versions
-            grep '^VERSIONS' versions.txt | while read _ KEY VERSION_ID _; do
-              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
-                aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region $REGION || true
-                FOUND=1
-              fi
-            done
-            # Delete all delete markers
-            grep '^DELETEMARKERS' versions.txt | while read _ KEY VERSION_ID _; do
-              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
-                aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region $REGION || true
-                FOUND=1
-              fi
-            done
-            # If nothing found, break
-            if ! grep -q '^VERSIONS\|^DELETEMARKERS' versions.txt; then
+            # Lists object versions and delete markers from the versioned bucket.
+            aws s3api list-object-versions \
+              --bucket "$BUCKET" \
+              --region "$REGION" \
+              --output json > versions.json
+
+            # Counts both normal object versions and delete markers.
+            COUNT=$(jq '[.Versions[]?, .DeleteMarkers[]?] | length' versions.json)
+
+            echo "Found $COUNT versioned entries to delete."
+
+            if [ "$COUNT" -eq 0 ]; then
               break
             fi
+
+            # Builds a delete request containing both object versions and delete markers.
+            jq -c '{
+              Objects: ([.Versions[]?, .DeleteMarkers[]?] | map({
+                Key: .Key,
+                VersionId: .VersionId
+              })),
+              Quiet: true
+            }' versions.json > delete.json
+
+            # Deletes the listed object versions and delete markers.
+            aws s3api delete-objects \
+              --bucket "$BUCKET" \
+              --region "$REGION" \
+              --delete file://delete.json
           done
 
           echo "Deleting S3 bucket..."
-          aws s3 rb s3://$BUCKET --force --region $REGION || true
+          aws s3api delete-bucket \
+            --bucket "$BUCKET" \
+            --region "$REGION"
 
           echo "Deleting DynamoDB table..."
-          aws dynamodb delete-table --table-name $TABLE --region $REGION || true
+          aws dynamodb delete-table \
+            --table-name "$TABLE" \
+            --region "$REGION" || true
