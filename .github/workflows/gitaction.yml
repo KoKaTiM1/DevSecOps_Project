@@ -94,3 +94,21 @@ jobs:
       - name: Terraform Destroy
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
         run: terraform destroy -input=false -auto-approve
+
+      - name: Cleanup S3 bucket and DynamoDB table
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+        env:
+          AWS_REGION: us-east-1
+        run: |
+          BUCKET="project-final-devopssec-terraform-state"
+          TABLE="project-terraform-locks"
+          REGION="${{ env.AWS_REGION }}"
+
+          echo "Emptying S3 bucket..."
+          aws s3 rm s3://$BUCKET --recursive --region $REGION || true
+
+          echo "Deleting S3 bucket..."
+          aws s3 rb s3://$BUCKET --force --region $REGION || true
+
+          echo "Deleting DynamoDB table..."
+          aws dynamodb delete-table --table-name $TABLE --region $REGION || true
