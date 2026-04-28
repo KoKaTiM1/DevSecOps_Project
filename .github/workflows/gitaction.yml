@@ -99,35 +99,34 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
         env:
           AWS_REGION: us-east-1
-          TL_DEBUG: DEBUG
         run: |
           BUCKET="project-final-devopssec-terraform-state"
           TABLE="project-terraform-locks"
           REGION="${{ env.AWS_REGION }}"
 
           echo "Removing all object versions and delete markers from S3 bucket..."
-          while : ; do
+          while true; do
             aws s3api list-object-versions --bucket "$BUCKET" --region "$REGION" --output json > versions.json
-            COUNT=$(cat versions.json | grep -cE '\"VersionId\"')
-            if [ "$COUNT" -eq 0 ]; then
-              break
-            fi
             # Delete all versions
-            for row in $(aws s3api list-object-versions --bucket "$BUCKET" --region "$REGION" --query 'Versions[].{Key:Key,VersionId:VersionId}' --output text); do
-              KEY=$(echo $row | awk '{print $1}')
-              VERSION_ID=$(echo $row | awk '{print $2}')
-              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
+            cat versions.json | grep -o '"Key":"[^"]*","VersionId":"[^"]*"' | while read line; do
+              KEY=$(echo $line | sed -n 's/.*\"Key\":\"\\{0,1\\}\\{0,1\\}\\([^\"\\]*\\)\".*/\\1/p')
+              VERSION_ID=$(echo $line | sed -n 's/.*\"VersionId\":\"\\{0,1\\}\\([^\"\\]*\\)\".*/\\1/p')
+              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
                 aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region "$REGION" || true
               fi
             done
             # Delete all delete markers
-            for row in $(aws s3api list-object-versions --bucket "$BUCKET" --region "$REGION" --query 'DeleteMarkers[].{Key:Key,VersionId:VersionId}' --output text); do
-              KEY=$(echo $row | awk '{print $1}')
-              VERSION_ID=$(echo $row | awk '{print $2}')
-              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
+            cat versions.json | grep -o '"Key":"[^"]*","VersionId":"[^"]*","IsLatest":false,"DeleteMarker":true' | while read line; do
+              KEY=$(echo $line | sed -n 's/.*\"Key\":\"\\{0,1\\}\\{0,1\\}\\([^\"\\]*\\)\".*/\\1/p')
+              VERSION_ID=$(echo $line | sed -n 's/.*\"VersionId\":\"\\{0,1\\}\\([^\"\\]*\\)\".*/\\1/p')
+              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
                 aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region "$REGION" || true
               fi
             done
+            # If no more versions or delete markers, break
+            if ! grep -q '"VersionId":"' versions.json; then
+              break
+            fi
           done
 
           echo "Deleting S3 bucket..."
