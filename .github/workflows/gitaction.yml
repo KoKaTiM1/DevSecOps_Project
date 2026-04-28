@@ -107,18 +107,37 @@ jobs:
 
           echo "Removing all object versions and delete markers from S3 bucket..."
           while true; do
-            OUTPUT=$(aws s3api list-object-versions --bucket "$BUCKET" --region "$REGION" --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}, DeleteMarkers: DeleteMarkers[].{Key:Key,VersionId:VersionId}}' --output text)
-            FOUND=0
-            echo "$OUTPUT" | grep -E '^[^ ]+ +[^ ]+$' | while read -r KEY VERSION_ID; do
-              if [ -n "$KEY" ] && [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
-                aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region "$REGION" || true
-                FOUND=1
-              fi
-            done
-            # If nothing found, break
-            if [ "$FOUND" -eq 0 ]; then
-              break
+            # Get all object versions and delete markers
+            aws s3api list-object-versions --bucket "$BUCKET" --region "$REGION" --output json > versions.json
+
+            # Delete all versions
+            VERSIONS=$(cat versions.json | grep -o '"Key":"[^"]*","VersionId":"[^"]*"' | wc -l)
+            if [ "$VERSIONS" -gt 0 ]; then
+              for row in $(cat versions.json | grep -o '"Key":"[^"]*","VersionId":"[^"]*"' | sed 's/\"Key\":\"//;s/\",\"VersionId\":\"/ /;s/\"//g'); do
+                KEY=$(echo $row | awk '{print $1}')
+                VERSION_ID=$(echo $row | awk '{print $2}')
+                if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
+                  aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region "$REGION" || true
+                fi
+              done
+              continue
             fi
+
+            # Delete all delete markers
+            MARKERS=$(cat versions.json | grep -o '"Key":"[^"]*","VersionId":"[^"]*","IsLatest":false,"DeleteMarker":true' | wc -l)
+            if [ "$MARKERS" -gt 0 ]; then
+              for row in $(cat versions.json | grep -o '"Key":"[^"]*","VersionId":"[^"]*","IsLatest":false,"DeleteMarker":true' | sed 's/\"Key\":\"//;s/\",\"VersionId\":\"/ /;s/\",\"IsLatest\":false,\"DeleteMarker\":true//;s/\"//g'); do
+                KEY=$(echo $row | awk '{print $1}')
+                VERSION_ID=$(echo $row | awk '{print $2}')
+                if [ -n "$KEY" ] && [ -n "$VERSION_ID" ]; then
+                  aws s3api delete-object --bucket "$BUCKET" --key "$KEY" --version-id "$VERSION_ID" --region "$REGION" || true
+                fi
+              done
+              continue
+            fi
+
+            # If no versions or markers left, break
+            break
           done
 
           echo "Deleting S3 bucket..."
