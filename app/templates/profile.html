@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ info.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="profile-detail" style="text-align:center; margin-top:40px;">
+    {% if photo %}
+      <img src="{{ url_for('static', filename=photo) }}" class="profile-img" alt="{{ info.name }}">
+    {% endif %}
+    <h1>{{ info.name }}</h1>
+    <h2>{{ info.role }}</h2>
+    <p style="max-width:600px; margin: 0 auto;">{{ info.bio }}</p>
+    <div style="margin-top:30px;">
+      <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

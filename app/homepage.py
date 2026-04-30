@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, render_template
 
 
+
 app = Flask(__name__)
+
 
 PROFILE = {
     "name": "Your Name",
@@ -13,6 +15,22 @@ PROFILE = {
     "github": "https://github.com/KoKaTiM1",
     "linkedin": "https://www.linkedin.com/",
     "email": "you@example.com",
+}
+
+# Profiles for individual pages
+PROFILES = {
+    "yourname": {
+        "name": "Your Name",
+        "role": "DevOps / Cloud Engineer",
+        "bio": "Full information about you goes here. Add your details, experience, and contact info.",
+        "photo": "profile_picture/mine.webp"
+    },
+    "coworker": {
+        "name": "Coworker Name",
+        "role": "DevOps Engineer",
+        "bio": "Full information about your coworker goes here. Add their details, experience, and contact info.",
+        "photo": "profile_picture/coworker.webp"
+    }
 }
 
 PROJECTS = [
@@ -67,6 +85,7 @@ SKILLS = [
 ]
 
 
+
 @app.route('/')
 def homepage():
     return render_template(
@@ -76,6 +95,14 @@ def homepage():
         deployment=DEPLOYMENT_INFO,
         skills=SKILLS,
     )
+
+# Route for individual profiles
+@app.route('/profile/<name>')
+def profile(name):
+    info = PROFILES.get(name)
+    if not info:
+        return render_template('profile.html', info={"name": "Not Found", "role": "", "bio": "Profile not found."}, photo=None)
+    return render_template('profile.html', info=info, photo=info["photo"])
 
 
 @app.route('/health')
