@@ -413,6 +413,102 @@ body.profile-page {
   font-size: 1.04rem;
 }
 
+.profile-grid {
+  margin-top: 1.4rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.profile-panel {
+  text-align: left;
+  background: linear-gradient(155deg, rgba(240, 253, 250, 0.95), rgba(255, 255, 255, 0.95));
+  border: 1px solid #b5ece2;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+}
+
+.profile-panel h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.profile-panel p {
+  margin: 0;
+  color: #334155;
+  font-size: 0.94rem;
+}
+
+.profile-tags {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.profile-tags li {
+  background: #ecfeff;
+  border: 1px solid #99f6e4;
+  color: #0f766e;
+  border-radius: 999px;
+  padding: 0.22rem 0.62rem;
+  font-size: 0.79rem;
+  font-weight: 600;
+}
+
+.cv-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+  padding: 0.45rem 0.85rem;
+  background: linear-gradient(135deg, #0f766e, #115e59);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.87rem;
+  transition: all 0.2s ease;
+}
+
+.cv-link:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+
+.profile-highlights {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.profile-highlight-item {
+  text-align: left;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #d9e5f1;
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+
+.profile-highlight-item span {
+  display: block;
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-bottom: 0.2rem;
+}
+
+.profile-highlight-item strong {
+  display: block;
+  font-size: 0.91rem;
+  color: #0f172a;
+}
+
 .profile-actions {
   margin-top: 1.8rem;
   display: flex;
@@ -447,5 +543,13 @@ body.profile-page .btn-primary:hover {
 
   .profile-bio {
     font-size: 0.98rem;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-highlights {
+    grid-template-columns: 1fr;
   }
 }

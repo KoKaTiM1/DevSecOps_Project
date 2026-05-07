@@ -24,6 +24,43 @@
 
       <p class="profile-bio">{{ info.bio }}</p>
 
+      <section class="profile-grid" aria-label="Professional details">
+        <article class="profile-panel">
+          <h2>Curriculum Vitae</h2>
+          <p>
+            Complete professional background, experience, and qualifications.
+          </p>
+          <a href="{{ url_for('static', filename='cv/Daniel_Cohen_CV.pdf') }}" target="_blank" rel="noreferrer" class="cv-link">
+            📄 View Full CV (PDF)
+          </a>
+        </article>
+
+        <article class="profile-panel">
+          <h2>Focus Areas</h2>
+          <ul class="profile-tags" aria-label="Core strengths">
+            <li>CI/CD Automation</li>
+            <li>Cloud Security</li>
+            <li>Infrastructure as Code</li>
+            <li>Monitoring & Reliability</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="profile-highlights" aria-label="Career highlights">
+        <div class="profile-highlight-item">
+          <span>Approach</span>
+          <strong>Security-First</strong>
+        </div>
+        <div class="profile-highlight-item">
+          <span>Delivery Style</span>
+          <strong>Automated & Measurable</strong>
+        </div>
+        <div class="profile-highlight-item">
+          <span>Preferred Stack</span>
+          <strong>Python · Docker · AWS</strong>
+        </div>
+      </section>
+
       <div class="profile-actions">
         <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
       </div>
