@@ -4,7 +4,7 @@
 
 ## Flow
 
-**Phase 1 → Phase 2 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8**
+**Phase 1 → Phase 2 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10 → Phase 11 → Phase 12 → Phase 13**
 
 ---
 
@@ -135,7 +135,117 @@ The site visibly shows deployment metadata.
 
 ---
 
-## Phase 8 — Improve security and cleanup
+## Phase 8 — Add pre-deployment tests (code check)
+
+**Goal:** validate code quality and functionality before deployment.
+
+### Add to GitHub Actions:
+- Python linting (pylint, flake8)
+- Unit tests for Flask routes
+- Security scanning (bandit for Python)
+- Dependency check (safety)
+
+### Test types:
+- Syntax validation
+- Code style checks
+- Unit tests for critical functions
+- Docker build test
+
+### Deliverable:
+GitHub Actions runs tests on every push; deployment only proceeds if tests pass.
+
+---
+
+## Phase 9 — Add post-deployment tests (health check)
+
+**Goal:** verify the app works correctly after deployment.
+
+### Health checks:
+- HTTP 200 on `/health` endpoint
+- Check `/` homepage loads
+- Verify deployment info displays correctly
+- Test profile pages load
+
+### Automation:
+- GitHub Actions waits for deployment
+- Runs smoke tests against live URL
+- Rolls back if tests fail (optional)
+
+### Deliverable:
+Deployment includes automated verification that the app is working.
+
+---
+
+## Phase 10 — Add HTTPS/TLS
+
+**Goal:** secure traffic with SSL certificates.
+
+### Setup:
+- Get SSL certificate (Let's Encrypt free)
+- Configure in load balancer or reverse proxy (nginx)
+- Redirect HTTP → HTTPS
+- Update security group to allow 443
+
+### For EKS:
+- AWS Certificate Manager (ACM) free certificates
+- ALB Ingress controller handles TLS
+- Automatic cert renewal
+
+### Deliverable:
+Site accessible via HTTPS with valid certificate.
+
+---
+
+## Phase 11 — Migrate from EC2 to EKS
+
+**Goal:** move from single EC2 to managed Kubernetes cluster.
+
+### Setup EKS with Terraform:
+- EKS cluster
+- Node groups (auto-scaling)
+- IAM roles and service accounts
+- VPC and networking
+
+### Kubernetes manifests:
+- Deployment (3+ replicas)
+- Service (LoadBalancer)
+- Ingress (for HTTPS routing)
+- ConfigMaps for environment variables
+
+### Migrate deployment:
+- Update GitHub Actions to deploy via kubectl
+- Pull image from Docker Hub
+- Rolling updates (zero downtime)
+
+### Deliverable:
+App running on EKS cluster with automatic scaling and health checks.
+
+---
+
+## Phase 12 — Add monitoring with Prometheus
+
+**Goal:** observe application and infrastructure metrics.
+
+### Prometheus setup:
+- Deploy Prometheus to EKS
+- Scrape metrics from Flask app
+- Store time-series data
+
+### Add to Flask app:
+- `/metrics` endpoint (Prometheus client library)
+- Custom metrics: request count, response time, errors
+- Export to Prometheus
+
+### Visualization (optional):
+- Deploy Grafana dashboard
+- Create alerts for high error rates, latency
+
+### Deliverable:
+Real-time metrics visible in Prometheus; historical data stored; alerts configured.
+
+---
+
+## Phase 13 — Improve security and cleanup
 
 **Goal:** make the project presentation-ready.
 
