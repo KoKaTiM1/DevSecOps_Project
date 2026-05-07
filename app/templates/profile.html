@@ -1,20 +1,70 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>{{ info.name }}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ info.name }} | Profile</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
-  <div class="profile-detail" style="text-align:center; margin-top:40px;">
-    {% if photo %}
-      <img src="{{ url_for('static', filename=photo) }}" class="profile-img" alt="{{ info.name }}">
-    {% endif %}
-    <h1>{{ info.name }}</h1>
-    <h2>{{ info.role }}</h2>
-    <p style="max-width:600px; margin: 0 auto;">{{ info.bio }}</p>
-    <div style="margin-top:30px;">
-      <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
-    </div>
-  </div>
+<body class="profile-page">
+  <main class="profile-shell">
+    <section class="profile-detail-card">
+      <div class="profile-orb profile-orb-left" aria-hidden="true"></div>
+      <div class="profile-orb profile-orb-right" aria-hidden="true"></div>
+
+      {% if photo %}
+      <div class="profile-photo-wrap">
+        <img src="{{ url_for('static', filename=photo) }}" class="profile-detail-img" alt="{{ info.name }}">
+      </div>
+      {% endif %}
+
+      <p class="profile-kicker">Team Profile</p>
+      <h1 class="profile-title">{{ info.name }}</h1>
+      <p class="profile-role-pill">{{ info.role }}</p>
+
+      <p class="profile-bio">{{ info.bio }}</p>
+
+      <section class="profile-grid" aria-label="Professional details">
+        <article class="profile-panel">
+          <h2>Curriculum Vitae</h2>
+          <p>
+            Complete professional background, experience, and qualifications.
+          </p>
+          <a href="{{ url_for('static', filename='cv/' + info.name.replace(' ', '_') + '_CV.pdf') }}" target="_blank" rel="noreferrer" class="cv-link">
+            📄 View Full CV (PDF)
+          </a>
+        </article>
+
+        <article class="profile-panel">
+          <h2>Focus Areas</h2>
+          <ul class="profile-tags" aria-label="Core strengths">
+            <li>CI/CD Automation</li>
+            <li>Cloud Security</li>
+            <li>Infrastructure as Code</li>
+            <li>Monitoring & Reliability</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="profile-highlights" aria-label="Career highlights">
+        <div class="profile-highlight-item">
+          <span>Approach</span>
+          <strong>Security-First</strong>
+        </div>
+        <div class="profile-highlight-item">
+          <span>Delivery Style</span>
+          <strong>Automated & Measurable</strong>
+        </div>
+        <div class="profile-highlight-item">
+          <span>Preferred Stack</span>
+          <strong>Python · Docker · AWS</strong>
+        </div>
+      </section>
+
+      <div class="profile-actions">
+        <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
