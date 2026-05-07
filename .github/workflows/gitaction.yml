@@ -1,4 +1,4 @@
-name: Terraform AWS deploy+production workflow
+name: Terraform AWS
 
 on:
   workflow_dispatch:
@@ -12,12 +12,6 @@ on:
           - plan
           - apply
           - destroy
-
-  pull_request:
-    types:
-      - closed
-    branches:
-      - main
 
 permissions:
   id-token: write
@@ -59,7 +53,6 @@ jobs:
       - name: Create backend resources
         env:
           AWS_REGION: us-east-1
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
         run: |
           REGION="${{ env.AWS_REGION }}"
           BUCKET="project-final-devopssec-terraform-state"
@@ -79,15 +72,19 @@ jobs:
             --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' \
             --region $REGION 2>/dev/null || true
                   
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform Init
+        run: terraform init -reconfigure -input=false
+        env: 
+          TF_LOG: DEBUG
 
       - name: Terraform Plan
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'plan'
         run: terraform plan -input=false
 
       - name: Terraform Apply
-        env:
-          TF_LOG: DEBUG
-          
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
         run: terraform apply -input=false -auto-approve
 
