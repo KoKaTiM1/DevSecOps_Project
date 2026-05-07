@@ -30,7 +30,7 @@
           <p>
             Complete professional background, experience, and qualifications.
           </p>
-          <a href="{{ url_for('static', filename='cv/Daniel_Cohen_CV.pdf') }}" target="_blank" rel="noreferrer" class="cv-link">
+          <a href="{{ url_for('static', filename='cv/' + info.name.replace(' ', '_') + '_CV.pdf') }}" target="_blank" rel="noreferrer" class="cv-link">
             📄 View Full CV (PDF)
           </a>
         </article>
