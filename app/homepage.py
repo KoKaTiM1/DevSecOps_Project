@@ -1,6 +1,91 @@
 from flask import Flask, jsonify, render_template
+import time
+import subprocess
+import os
+import requests
+
+START_TIME = time.time()
+
+def get_uptime():
+    now = time.time()
+    uptime_seconds = now - START_TIME
+    return uptime_seconds
 
 
+def get_git_version():
+    """Get version from git tags or commit hash"""
+    try:
+        # Try to get the latest tag
+        version = subprocess.check_output(
+            ['git', 'describe', '--tags'],
+            stderr=subprocess.DEVNULL,
+            cwd=os.path.dirname(__file__) or '.'
+        ).decode().strip()
+        return version
+    except Exception:
+        try:
+            # Fallback to commit hash if no tags
+            commit = subprocess.check_output(
+                ['git', 'rev-parse', '--short', 'HEAD'],
+                cwd=os.path.dirname(__file__) or '.'
+            ).decode().strip()
+            return f"commit-{commit}"
+        except Exception:
+            return "unknown"
+
+
+def get_deploy_number():
+    """Get deploy number from git commit count"""
+    try:
+        count = subprocess.check_output(
+            ['git', 'rev-list', '--count', 'HEAD'],
+            cwd=os.path.dirname(__file__) or '.'
+        ).decode().strip()
+        return int(count)
+    except Exception:
+        return 0
+
+
+def is_aws_environment():
+    """Detect if running on AWS (EC2 or ECS)"""
+    # Check for AWS environment variables
+    if os.getenv('AWS_REGION') or os.getenv('AWS_EXECUTION_ENV') or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
+        return True
+
+    # Check for AWS EC2 metadata endpoint
+    try:
+        response = requests.get(
+            'http://169.254.169.254/latest/meta-data/',
+            timeout=0.5
+        )
+        return response.status_code == 200
+    except Exception:
+        return False
+
+
+def get_health_status():
+    """Get health status from /health endpoint"""
+    try:
+        # Try to call the health endpoint locally
+        response = requests.get('http://localhost/health', timeout=1)
+        if response.status_code == 200:
+            return "healthy"
+    except Exception:
+        pass
+    return "unknown"
+
+
+def get_deployment_info():
+    """Get dynamic deployment information"""
+    environment = "aws" if is_aws_environment() else "local"
+
+    return {
+        "version": get_git_version(),
+        "deploy_number": get_deploy_number(),
+        "environment": environment,
+        "status": "healthy",
+        "uptime": get_uptime(),
+    }
 
 app = Flask(__name__)
 
@@ -66,12 +151,6 @@ PROJECTS = [
     },
 ]
 
-DEPLOYMENT_INFO = {
-    "version": "v0.1.0-local",
-    "last_deploy": "Not deployed yet",
-    "environment": "local",
-    "status": "healthy",
-}
 
 # Change this to a photos for each skill.
 SKILLS = [  
@@ -92,7 +171,7 @@ def homepage():
         'index.html',
         profile=PROFILE,
         projects=PROJECTS,
-        deployment=DEPLOYMENT_INFO,
+        deployment=get_deployment_info(),
         skills=SKILLS,
     )
 
@@ -107,12 +186,12 @@ def profile(name):
 
 @app.route('/health')
 def health():
-    return jsonify({"status": "ok"}), 200
+    return jsonify({"status": "healthy"}), 200
 
 
 @app.route('/api/status')
 def api_status():
-    return jsonify(DEPLOYMENT_INFO), 200
+    return jsonify(get_deployment_info()), 200
 
 
 @app.route('/api/projects')
