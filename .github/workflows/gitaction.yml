@@ -85,7 +85,10 @@ jobs:
         run: terraform plan -input=false
 
       - name: Terraform Apply
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply' # || github.action.pull_request.closed == 'true'
+        env:
+          TF_LOG: DEBUG
+          
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
         run: terraform apply -input=false -auto-approve
 
       - name: Terraform Destroy
