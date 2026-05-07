@@ -3,6 +3,7 @@ import time
 import subprocess
 import os
 import requests
+from datetime import datetime
 
 START_TIME = time.time()
 
@@ -10,6 +11,20 @@ def get_uptime():
     now = time.time()
     uptime_seconds = now - START_TIME
     return uptime_seconds
+
+
+def format_uptime(seconds):
+    """Format uptime seconds into human-readable format"""
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    
+    if hours > 0:
+        return f"{hours}h {minutes}m {secs}s"
+    elif minutes > 0:
+        return f"{minutes}m {secs}s"
+    else:
+        return f"{secs}s"
 
 
 def get_git_version():
@@ -78,13 +93,21 @@ def get_health_status():
 def get_deployment_info():
     """Get dynamic deployment information"""
     environment = "aws" if is_aws_environment() else "local"
+    
+    # Get current date/time for last_deploy
+    last_deploy = datetime.now().strftime("%Y-%m-%d %H:%M")
+    
+    # Get formatted uptime
+    uptime_seconds = get_uptime()
+    uptime_formatted = format_uptime(uptime_seconds)
 
     return {
         "version": get_git_version(),
         "deploy_number": get_deploy_number(),
         "environment": environment,
         "status": "healthy",
-        "uptime": get_uptime(),
+        "last_deploy": last_deploy,
+        "uptime": uptime_formatted,
     }
 
 app = Flask(__name__)
