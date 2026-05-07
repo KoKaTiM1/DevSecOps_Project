@@ -1,20 +1,33 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>{{ info.name }}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ info.name }} | Profile</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
-  <div class="profile-detail" style="text-align:center; margin-top:40px;">
-    {% if photo %}
-      <img src="{{ url_for('static', filename=photo) }}" class="profile-img" alt="{{ info.name }}">
-    {% endif %}
-    <h1>{{ info.name }}</h1>
-    <h2>{{ info.role }}</h2>
-    <p style="max-width:600px; margin: 0 auto;">{{ info.bio }}</p>
-    <div style="margin-top:30px;">
-      <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
-    </div>
-  </div>
+<body class="profile-page">
+  <main class="profile-shell">
+    <section class="profile-detail-card">
+      <div class="profile-orb profile-orb-left" aria-hidden="true"></div>
+      <div class="profile-orb profile-orb-right" aria-hidden="true"></div>
+
+      {% if photo %}
+      <div class="profile-photo-wrap">
+        <img src="{{ url_for('static', filename=photo) }}" class="profile-detail-img" alt="{{ info.name }}">
+      </div>
+      {% endif %}
+
+      <p class="profile-kicker">Team Profile</p>
+      <h1 class="profile-title">{{ info.name }}</h1>
+      <p class="profile-role-pill">{{ info.role }}</p>
+
+      <p class="profile-bio">{{ info.bio }}</p>
+
+      <div class="profile-actions">
+        <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
