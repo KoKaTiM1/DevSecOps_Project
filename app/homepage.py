@@ -4,6 +4,7 @@ import subprocess
 import os
 import requests
 from datetime import datetime
+from prometheus_flask_exporter import PrometheusMetrics
 
 START_TIME = time.time()
 
@@ -112,6 +113,7 @@ def get_deployment_info():
 
 app = Flask(__name__)
 
+metrics = PrometheusMetrics(app)
 
 PROFILE = {
     "name": "Your Name",
