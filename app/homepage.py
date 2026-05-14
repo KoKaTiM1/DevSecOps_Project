@@ -6,6 +6,7 @@ import requests
 from datetime import datetime
 from prometheus_flask_exporter import PrometheusMetrics
 
+
 START_TIME = time.time()
 
 def get_uptime():
