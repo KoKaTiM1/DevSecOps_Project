@@ -9,6 +9,7 @@ from prometheus_flask_exporter import PrometheusMetrics
 
 START_TIME = time.time()
 
+
 def get_uptime():
     now = time.time()
     uptime_seconds = now - START_TIME
@@ -20,7 +21,7 @@ def format_uptime(seconds):
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)
     secs = int(seconds % 60)
-    
+
     if hours > 0:
         return f"{hours}h {minutes}m {secs}s"
     elif minutes > 0:
@@ -112,6 +113,7 @@ def get_deployment_info():
         "uptime": uptime_formatted,
     }
 
+
 app = Flask(__name__)
 
 metrics = PrometheusMetrics(app)
@@ -200,6 +202,7 @@ def homepage():
         deployment=get_deployment_info(),
         skills=SKILLS,
     )
+
 
 # Route for individual profiles
 @app.route('/profile/<name>')
