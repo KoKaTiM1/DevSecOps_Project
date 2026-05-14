@@ -114,7 +114,17 @@ jobs:
       - name: Terraform Apply
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply' || github.event_name.pull_request && github.event.action == 'closed' && github.event.pull_request.merged == true
         run: terraform apply -input=false -auto-approve
-
+        
+      - name: Save Terraform Outputs
+        run: |
+          echo "=== Infrastructure Outputs ===" > /tmp/outputs.txt
+          terraform output >> /tmp/outputs.txt 2>&1
+          ping_ip=$(grep "server_public_ip" /tmp/outputs.txt | awk -F'=' '{print $2}' | tr -d ' "')
+          echo "Extracted IP: $ping_ip"
+          sleep 120
+          ping -c 4 "$ping_ip" > /tmp/ping_results.txt 2>&1 || true
+          cat /tmp/ping_results.txt
+          
       - name: Terraform Destroy
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
         run: terraform destroy -input=false -auto-approve
@@ -193,16 +203,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Save Terraform Outputs
-        run: |
-          echo "=== Infrastructure Outputs ===" > /tmp/outputs.txt
-          terraform output >> /tmp/outputs.txt 2>&1
-          ping_ip=$(grep "server_public_ip" /tmp/outputs.txt | awk -F'=' '{print $2}' | tr -d ' "')
-          echo "Extracted IP: $ping_ip"
-          sleep 120
-          ping -c 4 "$ping_ip" > /tmp/ping_results.txt 2>&1 || true
-          cat /tmp/ping_results.txt
-          
+
 
       
 
