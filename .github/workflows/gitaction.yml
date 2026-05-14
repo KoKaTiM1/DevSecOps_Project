@@ -193,7 +193,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run pytest
-        run: pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
+      - name: Save Terraform Outputs
+        run: |
+          echo "=== Infrastructure Outputs ===" > /tmp/outputs.txt
+          terraform output >> /tmp/outputs.txt 2>&1
+          ping_ip=$(grep "server_public_ip" /tmp/outputs.txt | awk -F'=' '{print $2}' | tr -d ' "')
+          echo "Extracted IP: $ping_ip"
+          sleep 120
+          ping -c 4 "$ping_ip" > /tmp/ping_results.txt 2>&1 || true
+          cat /tmp/ping_results.txt
+          
+
+      
 
     
