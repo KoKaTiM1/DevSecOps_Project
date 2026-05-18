@@ -32,3 +32,14 @@ module "ec2" {
   server_mode        = "docker"
   
 }
+
+module "eks" {
+  source = "./eks"
+  cluster_name       = "devsecops-cluster"
+  region             = "us-east-1"
+  vpc_id             = module.vpc.vpc
+  subnet_ids         = [module.vpc.subnet_id]
+  node_count         = 1
+  node_instance_type = "t3.small"
+  tags               = {}
+}

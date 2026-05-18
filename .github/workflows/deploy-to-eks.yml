@@ -1,0 +1,60 @@
+name: Build & Deploy to EKS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Skipping Docker build/push — using public image on Docker Hub
+
+      - name: Configure AWS credentials A
+        if: ${{ github.actor == 'KoKaTiM1' }}
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_A }}:role/oidc-provider
+          aws-region: us-east-1
+
+      - name: Configure AWS credentials B
+        if: ${{ github.actor == 'yossef-cohen' }}
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID_B }}:role/oidc-provider
+          aws-region: us-east-1
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Update kubeconfig
+        run: |
+          aws eks --region us-east-1 update-kubeconfig --name devsecops-cluster
+
+      - name: Deploy manifests
+        run: |
+          kubectl apply -f k8s/
+          kubectl set image deployment/devsecops web=kokatim1/devsecops-project:latest --record || true
+          kubectl rollout status deployment/devsecops --timeout=120s
+
+      - name: Wait for LoadBalancer & Smoke test
+        run: |
+          for i in {1..30}; do
+            LB=$(kubectl get svc devsecops-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+            if [ -n "$LB" ]; then echo "LoadBalancer: $LB"; break; fi
+            sleep 10
+          done
+          if [ -z "$LB" ]; then echo "LoadBalancer not ready"; exit 1; fi
+          echo "Waiting for app to respond..."
+          curl -sf "http://$LB/health" || (echo "Health check failed" && exit 1)
