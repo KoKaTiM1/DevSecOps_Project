@@ -38,7 +38,7 @@ module "eks" {
   cluster_name       = "devsecops-cluster"
   region             = "us-east-1"
   vpc_id             = module.vpc.vpc
-  subnet_ids         = [module.vpc.subnet_id]
+  subnet_ids         = module.vpc.subnet_ids
   node_count         = 1
   node_instance_type = "t3.small"
   tags               = {}
