@@ -57,4 +57,15 @@ jobs:
           done
           if [ -z "$LB" ]; then echo "LoadBalancer not ready"; exit 1; fi
           echo "Waiting for app to respond..."
-          curl -sf "http://$LB/health" || (echo "Health check failed" && exit 1)
+          for i in {1..30}; do
+            if curl -sf "http://$LB/health"; then
+              echo "Health check passed"
+              exit 0
+            fi
+
+            echo "Health check not ready yet. Retrying..."
+            sleep 10
+          done
+
+          echo "Health check failed"
+          exit 1
