@@ -26,10 +26,10 @@ ingress:
 
 # Serve Grafana from subpath '/grafana' so it works behind ALB path routing
 env:
-  - name: GF_SERVER_ROOT_URL
-    value: "http://a917928af38b040a0ba61c9063c13542-312153221.us-east-1.elb.amazonaws.com/grafana"
-  - name: GF_SERVER_SERVE_FROM_SUB_PATH
-    value: "true"
+  GF_SECURITY_ADMIN_USER: ""
+  GF_SECURITY_ADMIN_PASSWORD: ""
+  GF_SERVER_ROOT_URL: "http://a917928af38b040a0ba61c9063c13542-312153221.us-east-1.elb.amazonaws.com/grafana"
+  GF_SERVER_SERVE_FROM_SUB_PATH: "true"
 
 sidecar:
   datasources:
