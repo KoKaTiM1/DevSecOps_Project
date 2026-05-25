@@ -42,6 +42,38 @@ jobs:
         run: |
           aws eks --region us-east-1 update-kubeconfig --name devsecops-cluster
 
+      - name: Install Helm
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Ensure monitoring namespace
+        run: kubectl create ns monitoring || true
+
+      - name: Create Grafana admin secret
+        env:
+          GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+        run: |
+          kubectl -n monitoring create secret generic grafana-admin \
+            --from-literal=admin-user=admin \
+            --from-literal=admin-password="${GRAFANA_ADMIN_PASSWORD}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Install/upgrade Grafana
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+          helm upgrade --install grafana grafana/grafana -n monitoring -f k8s/grafana/values.yaml
+
+      - name: Apply Grafana datasource and dashboards
+        run: |
+          kubectl -n monitoring apply -f k8s/grafana/datasource-configmap.yaml
+          kubectl -n monitoring apply -f k8s/grafana/dashboards-configmap.yaml
+          kubectl -n monitoring apply -f k8s/grafana/ingress.yaml || true
+
+      - name: Wait for Grafana ready
+        run: |
+          kubectl -n monitoring rollout status deployment/grafana --timeout=120s
+
       - name: Deploy manifests
         run: |
           kubectl apply -f k8s/

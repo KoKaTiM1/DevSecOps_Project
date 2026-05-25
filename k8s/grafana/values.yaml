@@ -1,0 +1,38 @@
+admin:
+  existingSecret: grafana-admin
+
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: true
+  ingressClassName: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  # no host set - we use path-based routing on the ALB (ALB_URL/grafana)
+  hosts: []
+  tls: []
+
+# Serve Grafana from subpath '/grafana' so it works behind ALB path routing
+server:
+  root_url: "http://a917928af38b040a0ba61c9063c13542-312153221.us-east-1.elb.amazonaws.com/grafana"
+  serve_from_sub_path: true
+
+sidecar:
+  datasources:
+    enabled: true
+    label: grafana_datasource
+  dashboards:
+    enabled: true
+    label: grafana_dashboard

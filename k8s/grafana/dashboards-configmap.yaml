@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-sample
+  labels:
+    grafana_dashboard: "1"
+data:
+  sample-dashboard.json: |
+    {
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": null,
+      "panels": [],
+      "schemaVersion": 27,
+      "style": "dark",
+      "tags": ["sample"],
+      "templating": {"list": []},
+      "time": {"from": "now-6h", "to": "now"},
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Sample Dashboard",
+      "uid": null,
+      "version": 1
+    }
