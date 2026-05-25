@@ -2,7 +2,7 @@ admin:
   existingSecret: grafana-admin
 
 persistence:
-  enabled: true
+  enabled: false
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
