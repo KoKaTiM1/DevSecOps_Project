@@ -52,8 +52,8 @@ def get_git_version():
             return "unknown"
 
 
-def get_deploy_number():
-    """Get deploy number from git commit count"""
+def get_commits_number():
+    """Get commits number from git history"""
     try:
         count = subprocess.check_output(
             ['git', 'rev-list', '--count', 'HEAD'],
@@ -106,7 +106,7 @@ def get_deployment_info():
 
     return {
         "version": get_git_version(),
-        "deploy_number": get_deploy_number(),
+        "commits": get_commits_number(),
         "environment": environment,
         "status": "healthy",
         "last_deploy": last_deploy,
