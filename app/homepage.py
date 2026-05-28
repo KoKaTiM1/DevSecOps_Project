@@ -7,6 +7,7 @@ from datetime import datetime
 from prometheus_flask_exporter import PrometheusMetrics
 
 
+# start time for uptime calculation
 START_TIME = time.time()
 
 
