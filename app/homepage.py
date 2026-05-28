@@ -3,12 +3,24 @@ import time
 import subprocess
 import os
 import requests
+import re
 from datetime import datetime
 from prometheus_flask_exporter import PrometheusMetrics
 
 
 # start time for uptime calculation
 START_TIME = time.time()
+
+GITHUB_OWNER = os.getenv("GITHUB_OWNER", "KoKaTiM1")
+GITHUB_REPO = os.getenv("GITHUB_REPO", "DevSecOps_Project")
+GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPO}"
+GITHUB_BRANCH = os.getenv("GITHUB_BRANCH", "main")
+
+_repo_cache = {
+    "ts": 0,
+    "version": "unknown",
+    "commits": 0,
+}
 
 
 def get_uptime():
@@ -65,6 +77,61 @@ def get_commits_number():
         return 0
 
 
+def _github_headers():
+    token = os.getenv("GITHUB_TOKEN") or os.getenv("GITHUB_API_TOKEN")
+    if token:
+        return {"Authorization": f"Bearer {token}"}
+    return {}
+
+
+def _parse_commit_count(link_header, default_count):
+    if not link_header:
+        return default_count
+
+    match = re.search(r"page=(\d+)>;\s*rel=\"last\"", link_header)
+    if match:
+        return int(match.group(1))
+
+    return default_count
+
+
+def get_repo_version_and_commits():
+    now = time.time()
+    if now - _repo_cache["ts"] < 300:
+        return _repo_cache["version"], _repo_cache["commits"]
+
+    headers = _github_headers()
+
+    try:
+        commit_resp = requests.get(
+            f"{GITHUB_API_URL}/commits/{GITHUB_BRANCH}",
+            headers=headers,
+            timeout=2.5,
+        )
+        commit_resp.raise_for_status()
+        commit_data = commit_resp.json()
+        short_sha = commit_data.get("sha", "")[:7]
+        version = f"commit-{short_sha}" if short_sha else "unknown"
+
+        commits_resp = requests.get(
+            f"{GITHUB_API_URL}/commits?sha={GITHUB_BRANCH}&per_page=1",
+            headers=headers,
+            timeout=2.5,
+        )
+        commits_resp.raise_for_status()
+        default_count = len(commits_resp.json())
+        commits = _parse_commit_count(commits_resp.headers.get("Link"), default_count)
+
+        _repo_cache.update({
+            "ts": now,
+            "version": version,
+            "commits": commits,
+        })
+        return version, commits
+    except Exception:
+        return get_git_version(), get_commits_number()
+
+
 def is_aws_environment():
     """Detect if running on AWS (EC2 or ECS)"""
     # Check for AWS environment variables
@@ -105,9 +172,11 @@ def get_deployment_info():
     uptime_seconds = get_uptime()
     uptime_formatted = format_uptime(uptime_seconds)
 
+    version, commits = get_repo_version_and_commits()
+
     return {
-        "version": get_git_version(),
-        "commits": get_commits_number(),
+        "version": version,
+        "commits": commits,
         "environment": environment,
         "status": "healthy",
         "last_deploy": last_deploy,
