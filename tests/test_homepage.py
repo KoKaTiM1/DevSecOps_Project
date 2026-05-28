@@ -80,6 +80,6 @@ class TestUtilityFunctions:
     def test_get_deployment_info_structure(self):
         """Test get_deployment_info returns correct structure"""
         info = get_deployment_info()
-        required_keys = ['version', 'deploy_number', 'environment', 'status', 'last_deploy', 'uptime']
+        required_keys = ['version', 'commits', 'environment', 'status', 'last_deploy', 'uptime']
         for key in required_keys:
             assert key in info
