@@ -173,7 +173,11 @@ def get_health_status():
 
 def get_deployment_info():
     """Get dynamic deployment information"""
-    environment = "aws" if is_aws_environment() else "local"
+    environment_override = (os.getenv("DEPLOYMENT_ENV") or "").strip().lower()
+    if environment_override:
+        environment = environment_override
+    else:
+        environment = "aws" if is_aws_environment() else "local"
     
     # Get current date/time for last_deploy
     last_deploy = datetime.now().strftime("%Y-%m-%d %H:%M")
