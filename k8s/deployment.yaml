@@ -25,6 +25,8 @@ spec:
         env:
         - name: DEPLOYMENT_ENV
           value: aws
+        - name: TZ
+          value: Asia/Jerusalem
         ports:
         - containerPort: 80
         readinessProbe:
