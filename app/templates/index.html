@@ -10,33 +10,61 @@
   <header class="hero" id="top">
     <div class="hero-content container">
       <h1 class="main-title">Portfolio + Project Showcase + Deployment Info</h1>
+
       <div class="profile-row">
         <div class="profile-col">
           <a href="{{ url_for('profile', name='yourname') }}">
-            <img src="{{ url_for('static', filename='profile_picture/mine.webp') }}" alt="Your Name" class="profile-img-large">
+            <img
+              src="{{ url_for('static', filename='profile_picture/mine.webp') }}"
+              alt="{{ profiles.yourname.name }}"
+              class="profile-img-large"
+            >
           </a>
+
           <div class="profile-text">
-            <div class="profile-name">Your Name</div>
-            <div class="profile-role">DevOps / Cloud Engineer</div>
-            <div class="profile-desc">Building secure, automated delivery pipelines on AWS with Python and Docker.</div>
+            <div class="profile-name">{{ profiles.yourname.name }}</div>
+            <div class="profile-role">{{ profiles.yourname.role }}</div>
+            <div class="profile-desc">{{ profiles.yourname.tagline }}</div>
           </div>
+
           <div class="cta-group">
             <a class="btn btn-primary" href="#projects">View Projects</a>
-            <a class="btn btn-outline" href="{{ profile.github }}" target="_blank" rel="noreferrer">GitHub</a>
+            <a
+              class="btn btn-outline"
+              href="{{ profiles.yourname.github }}"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
           </div>
         </div>
+
         <div class="profile-col">
           <a href="{{ url_for('profile', name='coworker') }}">
-            <img src="{{ url_for('static', filename='profile_picture/coworker.webp') }}" alt="Coworker Name" class="profile-img-large">
+            <img
+              src="{{ url_for('static', filename='profile_picture/coworker.webp') }}"
+              alt="{{ profiles.coworker.name }}"
+              class="profile-img-large"
+            >
           </a>
+
           <div class="profile-text">
-            <div class="profile-name">Coworker Name</div>
-            <div class="profile-role">DevOps Engineer</div>
-            <div class="profile-desc">Coworker’s description here.</div>
+            <div class="profile-name">{{ profiles.coworker.name }}</div>
+            <div class="profile-role">{{ profiles.coworker.role }}</div>
+            <div class="profile-desc">{{ profiles.coworker.tagline }}</div>
           </div>
+
           <div class="cta-group">
             <a class="btn btn-primary" href="#projects">View Projects</a>
-            <a class="btn btn-outline" href="#" target="_blank" rel="noreferrer">GitHub</a>
+            <a
+              class="btn btn-outline"
+              href="{{ profiles.coworker.github }}"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
           </div>
         </div>
       </div>
@@ -46,19 +74,21 @@
   <main>
     <section class="section container" id="projects">
       <h3>Projects</h3>
+
       <div class="cards">
         {% for project in projects %}
         <article class="card">
           <h4>{{ project.title }}</h4>
           <p>{{ project.description }}</p>
+
           <ul class="tags">
             {% for tech in project.stack %}
             <li>{{ tech }}</li>
             {% endfor %}
           </ul>
+
           <div class="card-footer">
             <a href="{{ project.repo_url }}" target="_blank" rel="noreferrer">Repository</a>
-            <span class="badge">{{ project.demo }}</span>
           </div>
         </article>
         {% endfor %}
@@ -68,9 +98,10 @@
     <section class="section section-alt" id="deployment">
       <div class="container">
         <h3>Deployment Info</h3>
+
         <div class="stats-grid">
           <div class="stat"><span>Version</span><strong>{{ deployment.version }}</strong></div>
-          <div class="stat"><span>Commits Number</span><strong>{{ deployment.commits}}</strong></div>
+          <div class="stat"><span>Commits Number</span><strong>{{ deployment.commits }}</strong></div>
           <div class="stat"><span>Last Deploy</span><strong>{{ deployment.last_deploy }}</strong></div>
           <div class="stat"><span>Environment</span><strong>{{ deployment.environment }}</strong></div>
           <div class="stat"><span>Status</span><strong>{{ deployment.status }}</strong></div>
@@ -80,26 +111,24 @@
 
     <section class="section container" id="about">
       <h3>About</h3>
+
       <p>
-        I build practical cloud and DevOps workflows with a focus on security, automation,
-        and reliable delivery.
+        This project demonstrates a practical DevSecOps workflow that combines a Flask web
+        application, Docker-based deployment, GitHub Actions automation, AWS infrastructure,
+        deployment metadata, health checks, and monitoring-ready endpoints.
       </p>
+
+      <p>
+        The goal is to show how application development and cloud operations connect in a
+        real deployment flow: code is organized, containerized, validated, deployed, and
+        monitored through a simple portfolio interface.
+      </p>
+
       <ul class="skills">
         {% for skill in skills %}
         <li>{{ skill }}</li>
         {% endfor %}
       </ul>
-    </section>
-
-    <section class="section section-alt" id="contact">
-      <div class="container">
-        <h3>Contact</h3>
-        <div class="contact-links">
-          <a href="{{ profile.github }}" target="_blank" rel="noreferrer">GitHub</a>
-          <a href="{{ profile.linkedin }}" target="_blank" rel="noreferrer">LinkedIn</a>
-          <a href="mailto:{{ profile.email }}">{{ profile.email }}</a>
-        </div>
-      </div>
     </section>
   </main>
 </body>

@@ -189,11 +189,11 @@ app = Flask(__name__)
 metrics = PrometheusMetrics(app)
 
 PROFILE = {
-    "name": "Your Name",
-    "role": "DevOps / Cloud Engineer",
+    "name": "Daniel Cohen",
+    "role": "DevSecOps / Cloud Engineer",
     "tagline": (
-        "Building secure, automated delivery pipelines "
-        "on AWS with Python and Docker."
+        "Building secure DevSecOps workflows, automated cloud deployments, "
+        "and production-ready delivery pipelines on AWS."
     ),
     "github": "https://github.com/KoKaTiM1",
     "linkedin": "https://www.linkedin.com/",
@@ -203,55 +203,74 @@ PROFILE = {
 # Profiles for individual pages
 PROFILES = {
     "yourname": {
-        "name": "Your Name",
-        "role": "DevOps / Cloud Engineer",
-        "bio": "Full information about you goes here. Add your details, experience, and contact info.",
-        "photo": "profile_picture/mine.webp"
+        "name": "Daniel Cohen",
+        "role": "DevSecOps / Cloud Engineer",
+        "bio": (
+            "DevSecOps and cloud engineer focused on AWS infrastructure, "
+            "containerized applications, CI/CD automation, monitoring, "
+            "and secure deployment workflows."
+        ),
+        "tagline": (
+            "Focused on secure AWS deployments, automation, Docker, "
+            "Terraform, and CI/CD workflows."
+        ),
+        "photo": "profile_picture/mine.webp",
+        "github": "https://github.com/KoKaTiM1",
     },
     "coworker": {
-        "name": "Coworker Name",
-        "role": "DevOps Engineer",
-        "bio": "Full information about your coworker goes here. Add their details, experience, and contact info.",
-        "photo": "profile_picture/coworker.webp"
+        "name": "Yossef Cohen",
+        "role": "DevSecOps / Cloud Engineer",
+        "bio": (
+            "DevSecOps and cloud engineer contributing to cloud automation, "
+            "deployment reliability, infrastructure workflows, and secure "
+            "application delivery."
+        ),
+        "tagline": (
+            "Contributing to cloud automation, deployment reliability, "
+            "and secure infrastructure workflows."
+        ),
+        "photo": "profile_picture/coworker.webp",
+        "github": "https://github.com/yossef-cohen?tab=repositories",
     }
 }
+
+PROJECT_REPOSITORY_URL = "https://github.com/KoKaTiM1/DevSecOps_Project"
 
 PROJECTS = [
     {
         "title": "DevOps Portfolio Site",
         "description": (
-            "Flask portfolio app with deployment metadata "
-            "and health checks."
+            "A Flask-based portfolio application that presents team profiles, "
+            "project information, deployment metadata, health checks, and "
+            "runtime status in a clean web interface."
         ),
         "stack": ["Flask", "Python", "HTML", "CSS"],
-        "repo_url": "https://github.com/KoKaTiM1/DevSecOps21",
-        "demo": "Planned",
+        "repo_url": PROJECT_REPOSITORY_URL,
     },
     {
         "title": "Infrastructure Automation",
         "description": (
-            "Provision AWS infrastructure with Terraform "
-            "for repeatable deployments."
+            "Terraform-based AWS infrastructure automation designed to make "
+            "cloud provisioning repeatable, consistent, and easier to maintain "
+            "across environments."
         ),
-        "stack": ["Terraform", "AWS", "EC2"],
-        "repo_url": "https://github.com/KoKaTiM1",
-        "demo": "Planned",
+        "stack": ["Terraform", "AWS", "Cloud Infrastructure"],
+        "repo_url": PROJECT_REPOSITORY_URL,
     },
     {
         "title": "CI/CD Pipeline",
         "description": (
-            "GitHub Actions workflow to validate "
-            "and deploy containerized apps."
+            "GitHub Actions and Docker workflow for validating, building, and "
+            "deploying the application through an automated delivery process."
         ),
         "stack": ["GitHub Actions", "Docker", "Bash"],
-        "repo_url": "https://github.com/KoKaTiM1",
-        "demo": "Planned",
+        "repo_url": PROJECT_REPOSITORY_URL,
     },
 ]
 
 
-# Change this to a photos for each skill.
-SKILLS = [  
+# Skills displayed in the About section.
+SKILLS = [
     "Python",
     "Flask",
     "Docker",
@@ -259,6 +278,9 @@ SKILLS = [
     "AWS",
     "Linux",
     "GitHub Actions",
+    "CI/CD",
+    "Monitoring",
+    "DevSecOps",
 ]
 
 
@@ -268,6 +290,7 @@ def homepage():
     return render_template(
         'index.html',
         profile=PROFILE,
+        profiles=PROFILES,
         projects=PROJECTS,
         deployment=get_deployment_info(),
         skills=SKILLS,
