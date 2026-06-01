@@ -22,6 +22,18 @@ resource "aws_subnet" "subnet" {
   }
 }
 
+# Second public subnet in a different AZ for EKS requirements
+resource "aws_subnet" "subnet_b" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "public-subnet-b"
+  }
+}
+
 # Attach an Internet Gateway to the VPC.
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
@@ -50,6 +62,12 @@ resource "aws_route" "public_internet_access" {
 # Associate the subnet with the public route table.
 resource "aws_route_table_association" "public_assoc" {
   subnet_id      = aws_subnet.subnet.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+# Associate the second subnet with the public route table
+resource "aws_route_table_association" "public_assoc_b" {
+  subnet_id      = aws_subnet.subnet_b.id
   route_table_id = aws_route_table.public_rt.id
 }
 
@@ -100,6 +118,11 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_outbound_ipv4" {
 # Export the subnet ID for other modules.
 output "subnet_id" {
   value = aws_subnet.subnet.id
+}
+
+# Export the list of public subnet IDs (EKS requires subnets in >=2 AZs)
+output "subnet_ids" {
+  value = [aws_subnet.subnet.id, aws_subnet.subnet_b.id]
 }
 
 # Export the VPC ID for other modules.
