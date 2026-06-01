@@ -133,9 +133,19 @@ def get_repo_version_and_commits():
 
 
 def is_aws_environment():
-    """Detect if running on AWS (EC2 or ECS)"""
-    # Check for AWS environment variables
-    if os.getenv('AWS_REGION') or os.getenv('AWS_EXECUTION_ENV') or os.getenv('AWS_LAMBDA_FUNCTION_NAME'):
+    """Detect if running on AWS (EC2, ECS, or EKS)"""
+    aws_env_vars = (
+        'AWS_REGION',
+        'AWS_DEFAULT_REGION',
+        'AWS_EXECUTION_ENV',
+        'AWS_LAMBDA_FUNCTION_NAME',
+        'AWS_ROLE_ARN',
+        'AWS_WEB_IDENTITY_TOKEN_FILE',
+        'ECS_CONTAINER_METADATA_URI_V4',
+        'EKS_CLUSTER_NAME',
+    )
+    # Check for AWS/EKS environment variables
+    if any(os.getenv(name) for name in aws_env_vars):
         return True
 
     # Check for AWS EC2 metadata endpoint
@@ -163,7 +173,11 @@ def get_health_status():
 
 def get_deployment_info():
     """Get dynamic deployment information"""
-    environment = "aws" if is_aws_environment() else "local"
+    environment_override = (os.getenv("DEPLOYMENT_ENV") or "").strip().lower()
+    if environment_override:
+        environment = environment_override
+    else:
+        environment = "aws" if is_aws_environment() else "local"
     
     # Get current date/time for last_deploy
     last_deploy = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -261,6 +275,8 @@ SKILLS = [
     "GitHub Actions",
 ]
 
+HOMEPAGE_PROFILE_IMAGE_CLASS = "profile-img-large homepage-profile-img"
+
 
 
 @app.route('/')
@@ -271,6 +287,7 @@ def homepage():
         projects=PROJECTS,
         deployment=get_deployment_info(),
         skills=SKILLS,
+        homepage_profile_image_class=HOMEPAGE_PROFILE_IMAGE_CLASS,
     )
 
 

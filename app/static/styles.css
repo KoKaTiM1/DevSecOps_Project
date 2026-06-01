@@ -68,6 +68,49 @@ h1.main-title {
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   margin-bottom: 12px;
 }
+.homepage-profile-img {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  will-change: transform, box-shadow;
+}
+.homepage-profile-img:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 24px rgba(15, 118, 110, 0.28), 0 0 0 4px rgba(45, 212, 191, 0.16);
+  filter: brightness(1.02);
+}
+.homepage-profile-img:focus-visible {
+  outline: 3px solid rgba(45, 212, 191, 0.75);
+  outline-offset: 4px;
+}
+.homepage-profile-link {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+  border-radius: 50%;
+  line-height: 0;
+}
+.homepage-confetti {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(5);
+  transition: opacity 0.18s ease;
+  z-index: 2;
+}
+.homepage-profile-link:hover .homepage-confetti,
+.homepage-profile-link:focus-visible .homepage-confetti {
+  opacity: 1;
+}
+.homepage-profile-link > .homepage-profile-img {
+  position: relative;
+  z-index: 1;
+}
 .profile-text {
   text-align: center;
 }

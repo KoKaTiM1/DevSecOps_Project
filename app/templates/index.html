@@ -12,8 +12,9 @@
       <h1 class="main-title">Portfolio + Project Showcase + Deployment Info</h1>
       <div class="profile-row">
         <div class="profile-col">
-          <a href="{{ url_for('profile', name='yourname') }}">
-            <img src="{{ url_for('static', filename='profile_picture/mine.webp') }}" alt="Your Name" class="profile-img-large">
+          <a href="{{ url_for('profile', name='yourname') }}" class="homepage-profile-link">
+            <img src="{{ url_for('static', filename='profile_picture/mine.webp') }}" alt="Your Name" class="{{ homepage_profile_image_class }}">
+            <img src="{{ url_for('static', filename='conffeti.gif') }}" alt="" aria-hidden="true" class="homepage-confetti">
           </a>
           <div class="profile-text">
             <div class="profile-name">Your Name</div>
@@ -26,8 +27,9 @@
           </div>
         </div>
         <div class="profile-col">
-          <a href="{{ url_for('profile', name='coworker') }}">
-            <img src="{{ url_for('static', filename='profile_picture/coworker.webp') }}" alt="Coworker Name" class="profile-img-large">
+          <a href="{{ url_for('profile', name='coworker') }}" class="homepage-profile-link">
+            <img src="{{ url_for('static', filename='profile_picture/coworker.webp') }}" alt="Coworker Name" class="{{ homepage_profile_image_class }}">
+            <img src="{{ url_for('static', filename='conffeti.gif') }}" alt="" aria-hidden="true" class="homepage-confetti">
           </a>
           <div class="profile-text">
             <div class="profile-name">Coworker Name</div>
@@ -102,5 +104,24 @@
       </div>
     </section>
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const confettiImages = document.querySelectorAll('.homepage-profile-link .homepage-confetti');
+      confettiImages.forEach((img) => {
+        const baseSrc = img.getAttribute('src');
+        const link = img.closest('.homepage-profile-link');
+        if (!link || !baseSrc) {
+          return;
+        }
+        link.addEventListener('mouseenter', () => {
+          img.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+        });
+        link.addEventListener('focus', () => {
+          img.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
