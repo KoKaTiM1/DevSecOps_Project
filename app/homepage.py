@@ -84,6 +84,8 @@ SKILLS = [
     "GitHub Actions",
 ]
 
+HOMEPAGE_PROFILE_IMAGE_CLASS = "profile-img-large homepage-profile-img"
+
 
 
 @app.route('/')
@@ -94,6 +96,7 @@ def homepage():
         projects=PROJECTS,
         deployment=DEPLOYMENT_INFO,
         skills=SKILLS,
+        homepage_profile_image_class=HOMEPAGE_PROFILE_IMAGE_CLASS,
     )
 
 # Route for individual profiles
