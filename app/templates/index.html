@@ -131,5 +131,24 @@
       </ul>
     </section>
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const confettiImages = document.querySelectorAll('.homepage-profile-link .homepage-confetti');
+      confettiImages.forEach((img) => {
+        const baseSrc = img.getAttribute('src');
+        const link = img.closest('.homepage-profile-link');
+        if (!link || !baseSrc) {
+          return;
+        }
+        link.addEventListener('mouseenter', () => {
+          img.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+        });
+        link.addEventListener('focus', () => {
+          img.setAttribute('src', `${baseSrc}?t=${Date.now()}`);
+        });
+      });
+    });
+  </script>
 </body>
 </html>
