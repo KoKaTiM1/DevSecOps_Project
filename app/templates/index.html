@@ -13,11 +13,17 @@
 
       <div class="profile-row">
         <div class="profile-col">
-          <a href="{{ url_for('profile', name='yourname') }}">
+          <a href="{{ url_for('profile', name='yourname') }}" class="homepage-profile-link">
             <img
               src="{{ url_for('static', filename='profile_picture/mine.webp') }}"
               alt="{{ profiles.yourname.name }}"
-              class="profile-img-large"
+              class="profile-img-large homepage-profile-img"
+            >
+            <img
+              src="{{ url_for('static', filename='conffeti.gif') }}"
+              alt=""
+              aria-hidden="true"
+              class="homepage-confetti"
             >
           </a>
 
@@ -41,11 +47,17 @@
         </div>
 
         <div class="profile-col">
-          <a href="{{ url_for('profile', name='coworker') }}">
+          <a href="{{ url_for('profile', name='coworker') }}" class="homepage-profile-link">
             <img
               src="{{ url_for('static', filename='profile_picture/coworker.webp') }}"
               alt="{{ profiles.coworker.name }}"
-              class="profile-img-large"
+              class="profile-img-large homepage-profile-img"
+            >
+            <img
+              src="{{ url_for('static', filename='conffeti.gif') }}"
+              alt=""
+              aria-hidden="true"
+              class="homepage-confetti"
             >
           </a>
 
