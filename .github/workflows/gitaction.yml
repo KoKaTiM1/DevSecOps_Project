@@ -134,11 +134,11 @@ jobs:
         run: terraform plan -input=false
 
       - name: Terraform Apply
-        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply') || (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
+        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply') || (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && steps.changes.outputs.infra == 'true')
         run: terraform apply -input=false -auto-approve
         
       - name: Save Terraform Outputs
-        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply' && steps.changes.outputs.infra == 'true') || (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
+        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply') || (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && steps.changes.outputs.infra == 'true')
         run: |
           echo "=== Infrastructure Outputs ===" > /tmp/outputs.txt
           terraform output >> /tmp/outputs.txt 2>&1
